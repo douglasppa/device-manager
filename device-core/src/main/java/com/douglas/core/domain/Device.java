@@ -2,16 +2,17 @@ package com.douglas.core.domain;
 
 import java.time.Instant;
 import java.util.Objects;
+import java.util.UUID;
 
 public class Device {
 
-    private final Long id;
+    private final UUID id;
     private final String name;
     private final String brand;
     private final DeviceState state;
     private final Instant creationTime;
 
-    public Device(Long id, String name, String brand, DeviceState state, Instant creationTime) {
+    public Device(UUID id, String name, String brand, DeviceState state, Instant creationTime) {
         this.id = id;
         this.name = name;
         this.brand = brand;
@@ -19,7 +20,7 @@ public class Device {
         this.creationTime = creationTime;
     }
 
-    public Long getId() { return id; }
+    public UUID getId() { return id; }
     public String getName() { return name; }
     public String getBrand() { return brand; }
     public DeviceState getState() { return state; }
@@ -40,8 +41,7 @@ public class Device {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Device)) return false;
-        Device device = (Device) o;
+        if (!(o instanceof Device device)) return false;
         return Objects.equals(id, device.id);
     }
 

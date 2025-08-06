@@ -2,7 +2,12 @@ package com.douglas.persistence.mapper;
 
 import com.douglas.core.domain.Device;
 import com.douglas.persistence.entity.DeviceEntity;
+import org.springframework.stereotype.Component;
 
+/**
+ * Mapper for converting between DeviceEntity, Domain, and DTO.
+ */
+@Component
 public class DeviceMapper {
 
     public static DeviceEntity toEntity(Device device) {
@@ -15,7 +20,7 @@ public class DeviceMapper {
         return entity;
     }
 
-    public static Device toDomain(DeviceEntity entity) {
+    public Device toDomain(DeviceEntity entity) {
         return new Device(
                 entity.getId(),
                 entity.getName(),

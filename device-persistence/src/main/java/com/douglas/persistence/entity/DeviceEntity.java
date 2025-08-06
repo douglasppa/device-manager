@@ -2,6 +2,8 @@ package com.douglas.persistence.entity;
 
 import jakarta.persistence.*;
 import java.time.Instant;
+import java.util.UUID;
+
 import com.douglas.core.domain.DeviceState;
 
 @Entity
@@ -9,8 +11,8 @@ import com.douglas.core.domain.DeviceState;
 public class DeviceEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(columnDefinition = "uuid", updatable = false, nullable = false)
+    private UUID id;
 
     private String name;
     private String brand;
@@ -21,8 +23,8 @@ public class DeviceEntity {
     @Column(name = "creation_time", updatable = false)
     private Instant creationTime;
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public UUID getId() { return id; }
+    public void setId(UUID id) { this.id = id; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
