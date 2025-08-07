@@ -12,11 +12,11 @@ public class DeviceMapper {
 
     public static DeviceEntity toEntity(Device device) {
         DeviceEntity entity = new DeviceEntity();
-        entity.setId(device.getId());
-        entity.setName(device.getName());
-        entity.setBrand(device.getBrand());
-        entity.setState(device.getState());
-        entity.setCreationTime(device.getCreationTime());
+        entity.setId(device.id());
+        entity.setName(device.name());
+        entity.setBrand(device.brand());
+        entity.setState(device.state());
+        entity.setCreationTime(device.creationTime());
         return entity;
     }
 

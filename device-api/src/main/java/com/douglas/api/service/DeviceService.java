@@ -78,8 +78,8 @@ public class DeviceService {
 
         // Business rules
         if (!domainDevice.canChangeNameOrBrand()) {
-            if ((request.name() != null && !request.name().equals(domainDevice.getName())) ||
-                    (request.brand() != null && !request.brand().equals(domainDevice.getBrand()))) {
+            if ((request.name() != null && !request.name().equals(domainDevice.name())) ||
+                    (request.brand() != null && !request.brand().equals(domainDevice.brand()))) {
                 throw new DeviceInUseException("Cannot change name or brand while device is in use");
             }
         }
@@ -102,8 +102,8 @@ public class DeviceService {
 
         // Business rules
         if (!domainDevice.canChangeNameOrBrand()) {
-            if ((patch.name() != null && !patch.name().equals(domainDevice.getName())) ||
-                    (patch.brand() != null && !patch.brand().equals(domainDevice.getBrand()))) {
+            if ((patch.name() != null && !patch.name().equals(domainDevice.name())) ||
+                    (patch.brand() != null && !patch.brand().equals(domainDevice.brand()))) {
                 throw new DeviceInUseException("Cannot change name or brand while device is in use");
             }
         }

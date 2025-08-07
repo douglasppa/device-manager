@@ -12,11 +12,11 @@ public class DeviceDtoMapper {
 
     public DeviceResponseDTO toResponseDTO(Device device) {
         return new DeviceResponseDTO(
-                device.getId(),
-                device.getName(),
-                device.getBrand(),
-                device.getState(),
-                device.getCreationTime()
+                device.id(),
+                device.name(),
+                device.brand(),
+                device.state(),
+                device.creationTime()
         );
     }
 }

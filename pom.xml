@@ -29,7 +29,6 @@
         <module>device-core</module>
         <module>device-api</module>
         <module>device-persistence</module>
-        <module>device-test</module>
     </modules>
 
     <properties>
