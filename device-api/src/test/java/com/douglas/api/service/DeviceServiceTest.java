@@ -1,8 +1,11 @@
 package com.douglas.api.service;
 
-import com.douglas.api.dto.DevicePatchDTO;
-import com.douglas.api.dto.DeviceRequestDTO;
-import com.douglas.api.dto.DeviceResponseDTO;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import com.douglas.api.dto.DevicePatchDto;
+import com.douglas.api.dto.DeviceRequestDto;
+import com.douglas.api.dto.DeviceResponseDto;
 import com.douglas.api.exception.DeviceInUseException;
 import com.douglas.api.exception.DeviceNotFoundException;
 import com.douglas.api.mapper.DeviceDtoMapper;
@@ -10,303 +13,300 @@ import com.douglas.core.domain.DeviceState;
 import com.douglas.persistence.entity.DeviceEntity;
 import com.douglas.persistence.mapper.DeviceMapper;
 import com.douglas.persistence.repository.DeviceRepository;
+import java.time.Instant;
+import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
-import java.time.Instant;
-import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(org.mockito.junit.jupiter.MockitoExtension.class)
 class DeviceServiceTest {
 
-    @Mock
-    private DeviceRepository repository;
-
-    private final DeviceMapper entityMapper = new DeviceMapper();
+  @Mock private DeviceRepository repository;
+
+  private final DeviceMapper entityMapper = new DeviceMapper();
 
-    private final DeviceDtoMapper dtoMapper = new DeviceDtoMapper();
+  private final DeviceDtoMapper dtoMapper = new DeviceDtoMapper();
 
-    private DeviceService service;
+  private DeviceService service;
 
-    private UUID id;
-    private DeviceEntity entity;
-    private DeviceEntity entityA;
-    private DeviceEntity entityB;
+  private UUID id;
+  private DeviceEntity entity;
+  private DeviceEntity entityA;
+  private DeviceEntity entityB;
 
-    @BeforeEach
-    void setup() {
-        service = new DeviceService(repository, entityMapper, dtoMapper);
+  @BeforeEach
+  void setup() {
+    service = new DeviceService(repository, entityMapper, dtoMapper);
 
-        id = UUID.randomUUID();
-        UUID idA = UUID.randomUUID();
-        UUID idB = UUID.randomUUID();
+    id = UUID.randomUUID();
+    UUID idA = UUID.randomUUID();
+    UUID idB = UUID.randomUUID();
 
-        entity = new DeviceEntity();
-        entity.setId(id);
-        entity.setName("Device X");
-        entity.setBrand("Brand A");
-        entity.setState(DeviceState.AVAILABLE);
-        entity.setCreationTime(Instant.now());
+    entity = new DeviceEntity();
+    entity.setId(id);
+    entity.setName("Device X");
+    entity.setBrand("Brand A");
+    entity.setState(DeviceState.AVAILABLE);
+    entity.setCreationTime(Instant.now());
 
-        entityA = new DeviceEntity();
-        entityA.setId(idA);
-        entityA.setName("Device A");
-        entityA.setBrand("Brand X");
-        entityA.setState(DeviceState.AVAILABLE);
-        entityA.setCreationTime(Instant.now());
+    entityA = new DeviceEntity();
+    entityA.setId(idA);
+    entityA.setName("Device A");
+    entityA.setBrand("Brand X");
+    entityA.setState(DeviceState.AVAILABLE);
+    entityA.setCreationTime(Instant.now());
 
-        entityB = new DeviceEntity();
-        entityB.setId(idB);
-        entityB.setName("Device B");
-        entityB.setBrand("Brand Y");
-        entityB.setState(DeviceState.IN_USE);
-        entityB.setCreationTime(Instant.now());
-    }
+    entityB = new DeviceEntity();
+    entityB.setId(idB);
+    entityB.setName("Device B");
+    entityB.setBrand("Brand Y");
+    entityB.setState(DeviceState.IN_USE);
+    entityB.setCreationTime(Instant.now());
+  }
 
-    @Test
-    void shouldCreateDeviceSuccessfully() {
-        DeviceRequestDTO request = new DeviceRequestDTO("Device X", "Brand A", DeviceState.AVAILABLE);
+  @Test
+  void shouldCreateDeviceSuccessfully() {
+    DeviceRequestDto request = new DeviceRequestDto("Device X", "Brand A", DeviceState.AVAILABLE);
 
-        when(repository.save(any())).thenReturn(entity);
+    when(repository.save(any())).thenReturn(entity);
 
-        DeviceResponseDTO expected = dtoMapper.toResponseDTO(entityMapper.toDomain(entity));
+    DeviceResponseDto expected = dtoMapper.toResponseDto(entityMapper.toDomain(entity));
 
-        DeviceResponseDTO result = service.createDevice(request);
+    DeviceResponseDto result = service.createDevice(request);
 
-        assertNotNull(result);
-        assertEquals(expected.name(), result.name());
-        assertEquals(expected.brand(), result.brand());
-        assertEquals(expected.state(), result.state());
-        verify(repository).save(any());
-    }
+    assertNotNull(result);
+    assertEquals(expected.name(), result.name());
+    assertEquals(expected.brand(), result.brand());
+    assertEquals(expected.state(), result.state());
+    verify(repository).save(any());
+  }
 
-    @Test
-    void shouldReturnDeviceById() {
-        when(repository.findById(id)).thenReturn(Optional.of(entity));
+  @Test
+  void shouldReturnDeviceById() {
+    when(repository.findById(id)).thenReturn(Optional.of(entity));
 
-        DeviceResponseDTO expected = dtoMapper.toResponseDTO(entityMapper.toDomain(entity));
+    DeviceResponseDto expected = dtoMapper.toResponseDto(entityMapper.toDomain(entity));
 
-        DeviceResponseDTO result = service.getDeviceById(id);
+    DeviceResponseDto result = service.getDeviceById(id);
 
-        assertNotNull(result);
-        assertEquals(expected.id(), result.id());
-        assertEquals(expected.name(), result.name());
-        assertEquals(expected.brand(), result.brand());
-        assertEquals(expected.state(), result.state());
-        verify(repository).findById(id);
-    }
+    assertNotNull(result);
+    assertEquals(expected.id(), result.id());
+    assertEquals(expected.name(), result.name());
+    assertEquals(expected.brand(), result.brand());
+    assertEquals(expected.state(), result.state());
+    verify(repository).findById(id);
+  }
 
-    @Test
-    void shouldThrowExceptionWhenDeviceNotFound() {
-        when(repository.findById(id)).thenReturn(Optional.empty());
+  @Test
+  void shouldThrowExceptionWhenDeviceNotFound() {
+    when(repository.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(DeviceNotFoundException.class, () -> service.getDeviceById(id));
-    }
+    assertThrows(DeviceNotFoundException.class, () -> service.getDeviceById(id));
+  }
 
-    @Test
-    void shouldReturnAllDevicesWhenNoFilterApplied() {
-        when(repository.findAll()).thenReturn(List.of(entityA, entityB));
+  @Test
+  void shouldReturnAllDevicesWhenNoFilterApplied() {
+    when(repository.findAll()).thenReturn(List.of(entityA, entityB));
 
-        List<DeviceResponseDTO> expected = List.of(
-                dtoMapper.toResponseDTO(entityMapper.toDomain(entityA)),
-                dtoMapper.toResponseDTO(entityMapper.toDomain(entityB))
-        );
+    List<DeviceResponseDto> expected =
+        List.of(
+            dtoMapper.toResponseDto(entityMapper.toDomain(entityA)),
+            dtoMapper.toResponseDto(entityMapper.toDomain(entityB)));
 
-        List<DeviceResponseDTO> result = service.listDevices(null, null, null);
+    List<DeviceResponseDto> result = service.listDevices(null, null, null);
 
-        assertEquals(expected, result);
-        verify(repository).findAll();
-    }
+    assertEquals(expected, result);
+    verify(repository).findAll();
+  }
 
-    @Test
-    void shouldFilterByNameOnly() {
-        when(repository.findAll()).thenReturn(List.of(entityA, entityB));
+  @Test
+  void shouldFilterByNameOnly() {
+    when(repository.findAll()).thenReturn(List.of(entityA, entityB));
 
-        List<DeviceResponseDTO> result = service.listDevices("Device A", null, null);
+    List<DeviceResponseDto> result = service.listDevices("Device A", null, null);
 
-        assertEquals(1, result.size());
-        assertEquals("Device A", result.getFirst().name());
+    assertEquals(1, result.size());
+    assertEquals("Device A", result.getFirst().name());
 
-        verify(repository).findAll();
-    }
+    verify(repository).findAll();
+  }
 
-    @Test
-    void shouldFilterByBrandOnly() {
-        when(repository.findAll()).thenReturn(List.of(entityA, entityB));
+  @Test
+  void shouldFilterByBrandOnly() {
+    when(repository.findAll()).thenReturn(List.of(entityA, entityB));
 
-        List<DeviceResponseDTO> result = service.listDevices(null, "Brand X", null);
+    List<DeviceResponseDto> result = service.listDevices(null, "Brand X", null);
 
-        assertEquals(1, result.size());
-        assertEquals("Brand X", result.getFirst().brand());
+    assertEquals(1, result.size());
+    assertEquals("Brand X", result.getFirst().brand());
 
-        verify(repository).findAll();
-    }
+    verify(repository).findAll();
+  }
 
-    @Test
-    void shouldFilterByStateOnly() {
-        when(repository.findAll()).thenReturn(List.of(entityA, entityB));
+  @Test
+  void shouldFilterByStateOnly() {
+    when(repository.findAll()).thenReturn(List.of(entityA, entityB));
 
-        List<DeviceResponseDTO> result = service.listDevices(null, null, DeviceState.IN_USE);
+    List<DeviceResponseDto> result = service.listDevices(null, null, DeviceState.IN_USE);
 
-        assertEquals(1, result.size());
-        assertEquals(DeviceState.IN_USE, result.getFirst().state());
+    assertEquals(1, result.size());
+    assertEquals(DeviceState.IN_USE, result.getFirst().state());
 
-        verify(repository).findAll();
-    }
+    verify(repository).findAll();
+  }
 
-    @Test
-    void shouldFilterByNameAndBrandAndState() {
-        when(repository.findAll()).thenReturn(List.of(entityA, entityB));
+  @Test
+  void shouldFilterByNameAndBrandAndState() {
+    when(repository.findAll()).thenReturn(List.of(entityA, entityB));
 
-        List<DeviceResponseDTO> result = service.listDevices("Device A", "Brand X", DeviceState.AVAILABLE);
+    List<DeviceResponseDto> result =
+        service.listDevices("Device A", "Brand X", DeviceState.AVAILABLE);
 
-        assertEquals(1, result.size());
-        assertEquals("Device A", result.getFirst().name());
+    assertEquals(1, result.size());
+    assertEquals("Device A", result.getFirst().name());
 
-        verify(repository).findAll();
-    }
+    verify(repository).findAll();
+  }
 
-    @Test
-    void shouldReturnEmptyListWhenNoMatch() {
-        when(repository.findAll()).thenReturn(List.of(entityA, entityB));
+  @Test
+  void shouldReturnEmptyListWhenNoMatch() {
+    when(repository.findAll()).thenReturn(List.of(entityA, entityB));
 
-        List<DeviceResponseDTO> result = service.listDevices("Nonexistent", null, null);
+    List<DeviceResponseDto> result = service.listDevices("Nonexistent", null, null);
 
-        assertTrue(result.isEmpty());
-        verify(repository).findAll();
-    }
+    assertTrue(result.isEmpty());
+    verify(repository).findAll();
+  }
 
-    @Test
-    void shouldUpdateDeviceSuccessfully() {
-        DeviceRequestDTO update = new DeviceRequestDTO("Device X", "Brand A", DeviceState.INACTIVE);
+  @Test
+  void shouldUpdateDeviceSuccessfully() {
+    DeviceRequestDto update = new DeviceRequestDto("Device X", "Brand A", DeviceState.INACTIVE);
 
-        when(repository.findById(id)).thenReturn(Optional.of(entity));
-        when(repository.save(any())).thenReturn(entity);
+    when(repository.findById(id)).thenReturn(Optional.of(entity));
+    when(repository.save(any())).thenReturn(entity);
 
-        DeviceResponseDTO expected = dtoMapper.toResponseDTO(entityMapper.toDomain(entity));
+    DeviceResponseDto expected = dtoMapper.toResponseDto(entityMapper.toDomain(entity));
 
-        DeviceResponseDTO result = service.updateDevice(id, update);
+    DeviceResponseDto result = service.updateDevice(id, update);
 
-        assertEquals(expected.name(), result.name());
-        assertEquals(DeviceState.INACTIVE, result.state());
+    assertEquals(expected.name(), result.name());
+    assertEquals(DeviceState.INACTIVE, result.state());
 
-        verify(repository).save(entity);
-    }
+    verify(repository).save(entity);
+  }
 
-    @Test
-    void shouldThrowExceptionWhenUpdatingNonexistentDevice() {
-        DeviceRequestDTO update = new DeviceRequestDTO("Any", "Any", DeviceState.AVAILABLE);
+  @Test
+  void shouldThrowExceptionWhenUpdatingNonexistentDevice() {
+    DeviceRequestDto update = new DeviceRequestDto("Any", "Any", DeviceState.AVAILABLE);
 
-        when(repository.findById(id)).thenReturn(Optional.empty());
+    when(repository.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(DeviceNotFoundException.class, () -> service.updateDevice(id, update));
-    }
+    assertThrows(DeviceNotFoundException.class, () -> service.updateDevice(id, update));
+  }
 
-    @Test
-    void shouldAllowUpdateWhenInUseButNameAndBrandAreUnchanged() {
-        entity.setState(DeviceState.IN_USE);
-        DeviceRequestDTO update = new DeviceRequestDTO("Device X", "Brand A", DeviceState.IN_USE);
+  @Test
+  void shouldAllowUpdateWhenInUseButNameAndBrandAreUnchanged() {
+    entity.setState(DeviceState.IN_USE);
+    DeviceRequestDto update = new DeviceRequestDto("Device X", "Brand A", DeviceState.IN_USE);
 
-        when(repository.findById(id)).thenReturn(Optional.of(entity));
-        when(repository.save(any())).thenReturn(entity);
+    when(repository.findById(id)).thenReturn(Optional.of(entity));
+    when(repository.save(any())).thenReturn(entity);
 
-        DeviceResponseDTO result = service.updateDevice(id, update);
+    DeviceResponseDto result = service.updateDevice(id, update);
 
-        assertNotNull(result);
-        assertEquals("Device X", result.name());
-        assertEquals(DeviceState.IN_USE, result.state());
-    }
+    assertNotNull(result);
+    assertEquals("Device X", result.name());
+    assertEquals(DeviceState.IN_USE, result.state());
+  }
 
-    @Test
-    void shouldThrowWhenTryingToChangeNameInUse() {
-        entity.setState(DeviceState.IN_USE);
-        DeviceRequestDTO update = new DeviceRequestDTO("New Name", "Brand A", DeviceState.IN_USE);
+  @Test
+  void shouldThrowWhenTryingToChangeNameInUse() {
+    entity.setState(DeviceState.IN_USE);
+    DeviceRequestDto update = new DeviceRequestDto("New Name", "Brand A", DeviceState.IN_USE);
 
-        when(repository.findById(id)).thenReturn(Optional.of(entity));
+    when(repository.findById(id)).thenReturn(Optional.of(entity));
 
-        assertThrows(DeviceInUseException.class, () -> service.updateDevice(id, update));
-    }
+    assertThrows(DeviceInUseException.class, () -> service.updateDevice(id, update));
+  }
 
-    @Test
-    void shouldPatchStateOnly() {
-        DevicePatchDTO patch = new DevicePatchDTO(null, null, DeviceState.INACTIVE);
+  @Test
+  void shouldPatchStateOnly() {
+    DevicePatchDto patch = new DevicePatchDto(null, null, DeviceState.INACTIVE);
 
-        when(repository.findById(id)).thenReturn(Optional.of(entity));
-        when(repository.save(any())).thenReturn(entity);
+    when(repository.findById(id)).thenReturn(Optional.of(entity));
+    when(repository.save(any())).thenReturn(entity);
 
-        DeviceResponseDTO result = service.patchDevice(id, patch);
+    DeviceResponseDto result = service.patchDevice(id, patch);
 
-        assertEquals(DeviceState.INACTIVE, result.state());
-        verify(repository).save(entity);
-    }
+    assertEquals(DeviceState.INACTIVE, result.state());
+    verify(repository).save(entity);
+  }
 
-    @Test
-    void shouldThrowExceptionWhenPatchingNonexistentDevice() {
-        DevicePatchDTO patch = new DevicePatchDTO("Any", "Any", DeviceState.INACTIVE);
+  @Test
+  void shouldThrowExceptionWhenPatchingNonexistentDevice() {
+    DevicePatchDto patch = new DevicePatchDto("Any", "Any", DeviceState.INACTIVE);
 
-        when(repository.findById(id)).thenReturn(Optional.empty());
+    when(repository.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(DeviceNotFoundException.class, () -> service.patchDevice(id, patch));
-    }
+    assertThrows(DeviceNotFoundException.class, () -> service.patchDevice(id, patch));
+  }
 
-    @Test
-    void shouldAllowPatchWhenInUseButNameAndBrandAreUnchanged() {
-        entity.setState(DeviceState.IN_USE);
-        DevicePatchDTO patch = new DevicePatchDTO("Device X", "Brand A", DeviceState.IN_USE);
+  @Test
+  void shouldAllowPatchWhenInUseButNameAndBrandAreUnchanged() {
+    entity.setState(DeviceState.IN_USE);
+    DevicePatchDto patch = new DevicePatchDto("Device X", "Brand A", DeviceState.IN_USE);
 
-        when(repository.findById(id)).thenReturn(Optional.of(entity));
-        when(repository.save(any())).thenReturn(entity);
+    when(repository.findById(id)).thenReturn(Optional.of(entity));
+    when(repository.save(any())).thenReturn(entity);
 
-        DeviceResponseDTO result = service.patchDevice(id, patch);
+    DeviceResponseDto result = service.patchDevice(id, patch);
 
-        assertNotNull(result);
-        assertEquals("Device X", result.name());
-        assertEquals(DeviceState.IN_USE, result.state());
-    }
+    assertNotNull(result);
+    assertEquals("Device X", result.name());
+    assertEquals(DeviceState.IN_USE, result.state());
+  }
 
-    @Test
-    void shouldThrowWhenPatchingInUseDevice() {
-        entity.setState(DeviceState.IN_USE);
-        DevicePatchDTO patch = new DevicePatchDTO("New Name", null, null);
+  @Test
+  void shouldThrowWhenPatchingInUseDevice() {
+    entity.setState(DeviceState.IN_USE);
+    DevicePatchDto patch = new DevicePatchDto("New Name", null, null);
 
-        when(repository.findById(id)).thenReturn(Optional.of(entity));
+    when(repository.findById(id)).thenReturn(Optional.of(entity));
 
-        assertThrows(DeviceInUseException.class, () -> service.patchDevice(id, patch));
-    }
+    assertThrows(DeviceInUseException.class, () -> service.patchDevice(id, patch));
+  }
 
-    @Test
-    void shouldDeleteDevice() {
-        when(repository.findById(id)).thenReturn(Optional.of(entity));
+  @Test
+  void shouldDeleteDevice() {
+    when(repository.findById(id)).thenReturn(Optional.of(entity));
 
-        service.deleteDevice(id);
+    service.deleteDevice(id);
 
-        verify(repository).delete(entity);
-    }
+    verify(repository).delete(entity);
+  }
 
-    @Test
-    void shouldThrowExceptionWhenDeletingNonexistentDevice() {
-        when(repository.findById(id)).thenReturn(Optional.empty());
+  @Test
+  void shouldThrowExceptionWhenDeletingNonexistentDevice() {
+    when(repository.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(DeviceNotFoundException.class, () -> service.deleteDevice(id));
-    }
+    assertThrows(DeviceNotFoundException.class, () -> service.deleteDevice(id));
+  }
 
-    @Test
-    void shouldThrowWhenDeletingDeviceInUse() {
-        entity.setState(DeviceState.IN_USE);
+  @Test
+  void shouldThrowWhenDeletingDeviceInUse() {
+    entity.setState(DeviceState.IN_USE);
 
-        when(repository.findById(id)).thenReturn(Optional.of(entity));
+    when(repository.findById(id)).thenReturn(Optional.of(entity));
 
-        assertThrows(DeviceInUseException.class, () -> service.deleteDevice(id));
-        verify(repository, never()).delete(any());
-    }
+    assertThrows(DeviceInUseException.class, () -> service.deleteDevice(id));
+    verify(repository, never()).delete(any());
+  }
 
-    @Test
-    void testDeviceNotFoundExceptionMessage() {
-        DeviceNotFoundException ex = new DeviceNotFoundException(id);
-        assertTrue(ex.getMessage().contains(id.toString()));
-    }
+  @Test
+  void testDeviceNotFoundExceptionMessage() {
+    DeviceNotFoundException ex = new DeviceNotFoundException(id);
+    assertTrue(ex.getMessage().contains(id.toString()));
+  }
 }

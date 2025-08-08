@@ -1,48 +1,47 @@
 package com.douglas.api.exception;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.http.ResponseEntity;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Map;
 import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.ResponseEntity;
 
 class GlobalExceptionHandlerTest {
 
-    private final GlobalExceptionHandler handler = new GlobalExceptionHandler();
+  private final GlobalExceptionHandler handler = new GlobalExceptionHandler();
 
-    @Test
-    void shouldHandleNotFoundException() {
-        UUID id = UUID.randomUUID();
-        DeviceNotFoundException ex = new DeviceNotFoundException(id);
+  @Test
+  void shouldHandleNotFoundException() {
+    UUID id = UUID.randomUUID();
+    DeviceNotFoundException ex = new DeviceNotFoundException(id);
 
-        ResponseEntity<Map<String, Object>> response = handler.handleNotFound(ex);
+    ResponseEntity<Map<String, Object>> response = handler.handleNotFound(ex);
 
-        assertEquals(404, response.getStatusCodeValue());
-        assertNotNull(response.getBody());
-        assertTrue(response.getBody().get("error").toString().contains(id.toString()));
-    }
+    assertEquals(404, response.getStatusCodeValue());
+    assertNotNull(response.getBody());
+    assertTrue(response.getBody().get("error").toString().contains(id.toString()));
+  }
 
-    @Test
-    void shouldHandleInUseException() {
-        DeviceInUseException ex = new DeviceInUseException("Device is in use");
+  @Test
+  void shouldHandleInUseException() {
+    DeviceInUseException ex = new DeviceInUseException("Device is in use");
 
-        ResponseEntity<Map<String, Object>> response = handler.handleInUse(ex);
+    ResponseEntity<Map<String, Object>> response = handler.handleInUse(ex);
 
-        assertEquals(400, response.getStatusCodeValue());
-        assertNotNull(response.getBody());
-        assertEquals("Device is in use", response.getBody().get("error"));
-    }
+    assertEquals(400, response.getStatusCodeValue());
+    assertNotNull(response.getBody());
+    assertEquals("Device is in use", response.getBody().get("error"));
+  }
 
-    @Test
-    void shouldHandleGenericException() {
-        Exception ex = new RuntimeException("Unexpected crash");
+  @Test
+  void shouldHandleGenericException() {
+    Exception ex = new RuntimeException("Unexpected crash");
 
-        ResponseEntity<Map<String, Object>> response = handler.handleGeneric(ex);
+    ResponseEntity<Map<String, Object>> response = handler.handleGeneric(ex);
 
-        assertEquals(500, response.getStatusCodeValue());
-        assertNotNull(response.getBody());
-        assertTrue(response.getBody().get("error").toString().contains("Unexpected error:"));
-    }
+    assertEquals(500, response.getStatusCodeValue());
+    assertNotNull(response.getBody());
+    assertTrue(response.getBody().get("error").toString().contains("Unexpected error:"));
+  }
 }
